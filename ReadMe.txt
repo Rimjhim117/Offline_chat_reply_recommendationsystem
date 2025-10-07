@@ -1,5 +1,5 @@
 ================================================================================
-CHAT REPLY RECOMMENDATION SYSTEM
+OFFLINE CHAT REPLY RECOMMENDATION SYSTEM
 ================================================================================
 
 PROJECT OVERVIEW:
@@ -11,11 +11,10 @@ FILES INCLUDED:
 ================================================================================
 
 1. ChatRec_Model.py          - Main Python implementation
-2. Model.joblib               - Trained model (generated after running)
+2. Model.joblib               - Trained model 
 3. ReadMe.txt                 - This file
 4. conversation_data.csv      - Processed conversation data
-5. read_data.py              - Data loading utility
-6. demo_chat.py              - Interactive demo script
+5.Report.pdf                  -Project Overview
 
 ================================================================================
 REQUIREMENTS:
@@ -54,15 +53,6 @@ HOW TO RUN:
    - Evaluate performance
    - Save the trained model to Model.joblib
    - Show demo predictions
-
-2. Interactive Demo:
-   
-   python demo_chat.py
-
-   This allows you to:
-   - Enter custom User B messages
-   - Get predicted User A replies
-   - See similarity scores
 
 ================================================================================
 SYSTEM ARCHITECTURE:
@@ -151,7 +141,7 @@ FUTURE IMPROVEMENTS:
    - Perplexity for language modeling (needs generative model)
 
 ================================================================================
-CONTACT:
+CONTACT:rimjhimsrivastava971@gmail.com
 ================================================================================
 
 This system was built for the AI-ML Developer Intern Round 4 assignment.
