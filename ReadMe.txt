@@ -1,161 +1,109 @@
 ================================================================================
-CHAT REPLY RECOMMENDATION SYSTEM
+OFFLINE SEMANTIC CHAT REPLY RECOMMENDATION SYSTEM (UPGRADED)
 ================================================================================
 
 PROJECT OVERVIEW:
-This is an offline chat-reply recommendation system that predicts User A's 
-replies based on User B's messages using conversation history as context.
+This is an advanced, offline, context-aware chat reply recommendation system.
+It utilizes a Hybrid Matcher combining Sentence-Transformers (for semantic 
+meaning and synonym handling) and TF-IDF (for exact vocabulary overlap) to 
+accurately predict User A's replies to User B's messages.
+
+Unlike standard keyword-matching bots, this system recognizes user intent even
+when different words or phrasings are used (e.g., matching "Weekend plans?"
+to "Any plans for Saturday?").
 
 ================================================================================
 FILES INCLUDED:
 ================================================================================
 
-1. ChatRec_Model.py          - Main Python implementation
-2. Model.joblib               - Trained model (generated after running)
-3. ReadMe.txt                 - This file
-4. conversation_data.csv      - Processed conversation data
-5. read_data.py              - Data loading utility
-6. demo_chat.py              - Interactive demo script
-
-================================================================================
-REQUIREMENTS:
-================================================================================
-
-Python 3.10+
-Libraries:
-  - pandas
-  - numpy
-  - scikit-learn
-  - joblib
-  - openpyxl
-  - matplotlib
-
-================================================================================
-INSTALLATION:
-================================================================================
-
-All required libraries are pre-installed in this environment.
-If running elsewhere, install dependencies:
-
-    pip install pandas numpy scikit-learn joblib openpyxl matplotlib
-
-================================================================================
-HOW TO RUN:
-================================================================================
-
-1. Train the Model:
-   
-   python ChatRec_Model.py
-
-   This will:
-   - Load conversation data
-   - Preprocess and create training pairs
-   - Train the TF-IDF based similarity model
-   - Evaluate performance
-   - Save the trained model to Model.joblib
-   - Show demo predictions
-
-2. Interactive Demo:
-   
-   python demo_chat.py
-
-   This allows you to:
-   - Enter custom User B messages
-   - Get predicted User A replies
-   - See similarity scores
+1. ChatRec_Model.py      - Main model logic, hybrid similarity, and evaluation
+2. app.py                - Streamlit-powered premium web dashboard
+3. Model.joblib          - Serialized model, TF-IDF weights, and precomputed embeddings
+4. conversation_data.csv - Conversation history dataset (22 messages, 4 conversations)
+5. ReadMe.txt            - This documentation file
 
 ================================================================================
 SYSTEM ARCHITECTURE:
 ================================================================================
 
-1. DATA PREPROCESSING:
-   - Loads conversation data from Excel/CSV
-   - Identifies User A and User B
-   - Creates message pairs: (User B message + context) -> User A reply
-   - Context window: 3 previous messages
-   - Text cleaning: lowercase, remove extra spaces, remove quotes
+1. AUTOMATIC SENDER RESOLUTION:
+   - Analyzes dataset senders to dynamically isolate the initiator (User B) and 
+     the responder (User A).
+   - Resolves bugs from previous implementations where role assignments were 
+     dependent on the row order.
 
-2. MODEL APPROACH:
-   - TF-IDF Vectorization (1000 features, 1-3 n-grams)
-   - Cosine Similarity for finding similar contexts
-   - Context-aware matching using conversation history
-   - Top-K reply recommendation (default: 3)
+2. CONTEXT-AWARE PACKING:
+   - Packages historical conversation exchanges (context window = 3) with the 
+     trigger message using a special separation format:
+     `[Sender]: [Message] [SEP] ... [SEP] [User B Trigger Message]`
 
-3. WHY THIS APPROACH:
-   - Works offline without internet/GPU
-   - Fast training and inference
-   - Interpretable results
-   - Suitable for small datasets (22 messages)
-   - Captures conversation patterns effectively
+3. HYBRID MATCHING ALGORITHM:
+   - Semantic Encoder: Encodes the prompt into a 384-dimensional dense vector 
+     using the pre-trained 'all-MiniLM-L6-v2' model.
+   - Keyword Matcher: Creates a TF-IDF sparse matrix (1-3 n-grams).
+   - Ensemble Score: Combines both scores using a weighted average:
+     `Similarity = (0.7 * Semantic_Score) + (0.3 * TFIDF_Score)`
+   - Light & Offline: Loads in milliseconds, runs entirely locally, and 
+     requires no GPU.
 
-4. EVALUATION METRICS:
-   - Top-3 Accuracy: Checks if correct reply is in top 3 predictions
-   - Average Similarity Score: Measures confidence
-   - Context-aware matching performance
-
-================================================================================
-MODEL JUSTIFICATION:
-================================================================================
-
-For this offline task with limited data (22 messages), I chose a TF-IDF + 
-Cosine Similarity approach rather than full Transformer fine-tuning because:
-
-1. DATA SIZE: 22 messages is too small to fine-tune BERT/GPT-2/T5 effectively
-   - Risk of severe overfitting
-   - Transformers need 1000s of examples minimum
-
-2. OFFLINE CONSTRAINTS: 
-   - No internet for model downloads
-   - TF-IDF requires no pre-trained weights
-   - Fast training (<1 second vs hours)
-
-3. INTERPRETABILITY:
-   - Can explain why a reply was chosen (similarity scores)
-   - Easy to debug and improve
-
-4. DEPLOYMENT FEASIBILITY:
-   - Lightweight: ~few KB vs GB for Transformers
-   - Fast inference: <10ms vs 100ms+
-   - Low memory: ~few MB vs 1-8GB RAM
-
-ALTERNATIVE APPROACHES (if more data available):
-- GPT-2 fine-tuning for generative replies (needs 1000+ examples)
-- BERT for classification (needs labeled data)
-- T5 for seq2seq generation (needs diverse conversations)
+4. SEMANTIC CROSS-VALIDATION:
+   - Includes Leave-One-Out (LOO) cross-validation.
+   - Evaluates system capability to retrieve contextually appropriate responses
+     when the exact sample is withheld, preventing training-set data leakage.
 
 ================================================================================
-RESULTS:
+REQUIREMENTS:
 ================================================================================
 
-With the provided dataset:
-- Created training pairs from 4 conversations
-- Achieved context-aware reply matching
-- System can predict appropriate responses based on conversation patterns
+- Python 3.10+
+- Dependencies:
+  - streamlit
+  - sentence-transformers
+  - scikit-learn
+  - pandas
+  - numpy
+  - joblib
+  - matplotlib
+
+To install all dependencies (if running outside this pre-configured environment):
+  pip install streamlit sentence-transformers scikit-learn pandas numpy joblib matplotlib
 
 ================================================================================
-FUTURE IMPROVEMENTS:
+HOW TO RUN:
 ================================================================================
 
-1. With more data (1000+ messages):
-   - Fine-tune GPT-2 for generative replies
-   - Use dialogue-specific models (DialoGPT, Blenderbot)
+1. RUN CORE BENCHMARKS & TEST PREDICTIONS:
+   
+   python ChatRec_Model.py
 
-2. Advanced features:
-   - Sentiment analysis for tone matching
-   - Named entity recognition for personalization
-   - Multi-turn context tracking
+   This will:
+   - Load the dataset and correctly map the senders.
+   - Fit the TF-IDF vectorizer and compute Sentence-Transformer embeddings.
+   - Run benchmarks for TF-IDF vs. Semantic vs. Hybrid.
+   - Print out comparison queries showing the superiority of Semantic matching.
+   - Serialize the trained model to Model.joblib.
 
-3. Evaluation:
-   - BLEU score for text similarity
-   - ROUGE for summary quality
-   - Perplexity for language modeling (needs generative model)
+2. RUN THE STREAMLIT WEB DASHBOARD:
+   
+   streamlit run app.py
+
+   This launches an interactive, custom-styled dashboard in your browser.
+   Features include:
+   - **Interactive Sandbox**: Write arbitrary messages as User B, set a custom 
+     conversation history context, and view real-time ranked recommendations 
+     for User A (complete with similarity breakdown meters).
+   - **Model Evaluation**: Compare accuracy benchmarks and visualize similarity
+     distributions.
+   - **Dataset Explorer**: Inspect raw files and generated training pairs.
+   - **Hyperparameter Customization**: Adjust context windows, Top-K count, 
+     and the semantic-keyword weight slider in real-time.
+   - **CSV/Excel Uploader**: Instantly train the hybrid recommender on any custom
+     chat dataset.
 
 ================================================================================
-CONTACT:
+DEVELOPMENT NOTES:
 ================================================================================
-
-This system was built for the AI-ML Developer Intern Round 4 assignment.
-Duration: 120 minutes
-Focus: Context handling, Model optimization, Code efficiency
-
+- Model Version: 2.0 (Upgraded from simple TF-IDF baseline)
+- Pre-trained Embeddings: all-MiniLM-L6-v2 (384 Dimensions)
+- Design Guidelines: Clean, structured layout with responsive custom styles
 ================================================================================
