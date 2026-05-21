@@ -89,14 +89,9 @@ HOW TO RUN:
 
    This launches an interactive, custom-styled dashboard in your browser.
    Features include:
-   - **Interactive Sandbox**: Write arbitrary messages as User B, set a custom 
+   - **Interactive Simulator**: Type a message as User B, set a custom 
      conversation history context, and view real-time ranked recommendations 
-     for User A (complete with similarity breakdown meters).
-   - **Model Evaluation**: Compare accuracy benchmarks and visualize similarity
-     distributions.
-   - **Dataset Explorer**: Inspect raw files and generated training pairs.
-   - **Hyperparameter Customization**: Adjust context windows, Top-K count, 
-     and the semantic-keyword weight slider in real-time.
+     for User A (complete with similarity scores).
    - **CSV/Excel Uploader**: Instantly train the hybrid recommender on any custom
      chat dataset.
 
@@ -106,4 +101,7 @@ DEVELOPMENT NOTES:
 - Model Version: 2.0 (Upgraded from simple TF-IDF baseline)
 - Pre-trained Embeddings: all-MiniLM-L6-v2 (384 Dimensions)
 - Design Guidelines: Clean, structured layout with responsive custom styles
+
+================================================================================
+CONTACT: rimjhimsrivastava971@gmail.com
 ================================================================================
